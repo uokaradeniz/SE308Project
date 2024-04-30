@@ -47,7 +47,7 @@ namespace SE308Project
             //}
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        private void btnQuit_Click(object sender, EventArgs e)
         {
             Application.Exit();
         }
