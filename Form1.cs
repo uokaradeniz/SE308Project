@@ -28,7 +28,7 @@ namespace SE308Project
             MessageBox.Show("Simulation Started!");
         }
 
-        void UserA()
+        private void UserA()
         {
             lblUserA.Text = "User A Users: " + UserCountA;
             //float beginTime = tic();
@@ -37,7 +37,7 @@ namespace SE308Project
 
             //}
         }
-        void UserB()
+        private void UserB()
         {
             lblUserB.Text = "User B Users: " + UserCountB;
             //float beginTime = tic();
