@@ -28,17 +28,19 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             btnStartSim = new Button();
             lblUserA = new Label();
             lblUserB = new Label();
             lblUserBCounter = new Label();
             label3 = new Label();
-            comboBox1 = new ComboBox();
+            cmb_Isolation = new ComboBox();
             btnQuit = new Button();
             numUserA = new NumericUpDown();
             numUserB = new NumericUpDown();
-            richTextBox1 = new RichTextBox();
+            txt_EventLog = new RichTextBox();
             label1 = new Label();
+            timer = new System.Windows.Forms.Timer(components);
             ((System.ComponentModel.ISupportInitialize)numUserA).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numUserB).BeginInit();
             SuspendLayout();
@@ -94,15 +96,15 @@
             label3.TabIndex = 6;
             label3.Text = "Select an Isolation Level:";
             // 
-            // comboBox1
+            // cmb_Isolation
             // 
-            comboBox1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            comboBox1.FormattingEnabled = true;
-            comboBox1.Items.AddRange(new object[] { "READ UNCOMMITTED", "READ COMMITTED", "REPEATABLE READ", "SERIALIZABLE" });
-            comboBox1.Location = new Point(83, 57);
-            comboBox1.Name = "comboBox1";
-            comboBox1.Size = new Size(212, 28);
-            comboBox1.TabIndex = 7;
+            cmb_Isolation.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            cmb_Isolation.FormattingEnabled = true;
+            cmb_Isolation.Items.AddRange(new object[] { "READ UNCOMMITTED", "READ COMMITTED", "REPEATABLE READ", "SERIALIZABLE" });
+            cmb_Isolation.Location = new Point(83, 57);
+            cmb_Isolation.Name = "cmb_Isolation";
+            cmb_Isolation.Size = new Size(212, 28);
+            cmb_Isolation.TabIndex = 7;
             // 
             // btnQuit
             // 
@@ -129,13 +131,15 @@
             numUserB.Size = new Size(119, 27);
             numUserB.TabIndex = 10;
             // 
-            // richTextBox1
+            // txt_EventLog
             // 
-            richTextBox1.Location = new Point(362, 57);
-            richTextBox1.Name = "richTextBox1";
-            richTextBox1.Size = new Size(423, 243);
-            richTextBox1.TabIndex = 11;
-            richTextBox1.Text = "Deadlock Occured!\nDeadlock Occured!\nDeadlock Occured!\nDeadlock Occured!\nDeadlock Occured!\nDeadlock Occured!\n\n\n";
+            txt_EventLog.BackColor = SystemColors.ButtonHighlight;
+            txt_EventLog.Location = new Point(362, 57);
+            txt_EventLog.Name = "txt_EventLog";
+            txt_EventLog.ReadOnly = true;
+            txt_EventLog.Size = new Size(423, 243);
+            txt_EventLog.TabIndex = 11;
+            txt_EventLog.Text = "Ready!\n";
             // 
             // label1
             // 
@@ -147,17 +151,22 @@
             label1.TabIndex = 12;
             label1.Text = "Event Log";
             // 
+            // timer
+            // 
+            timer.Interval = 1001;
+            timer.Tick += timer_Tick;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(810, 348);
             Controls.Add(label1);
-            Controls.Add(richTextBox1);
+            Controls.Add(txt_EventLog);
             Controls.Add(numUserB);
             Controls.Add(numUserA);
             Controls.Add(btnQuit);
-            Controls.Add(comboBox1);
+            Controls.Add(cmb_Isolation);
             Controls.Add(label3);
             Controls.Add(lblUserBCounter);
             Controls.Add(lblUserB);
@@ -178,11 +187,12 @@
         private Label lblUserB;
         private Label lblUserBCounter;
         private Label label3;
-        private ComboBox comboBox1;
+        private ComboBox cmb_Isolation;
         private Button btnQuit;
         private NumericUpDown numUserA;
         private NumericUpDown numUserB;
-        private RichTextBox richTextBox1;
+        private RichTextBox txt_EventLog;
         private Label label1;
+        private System.Windows.Forms.Timer timer;
     }
 }
