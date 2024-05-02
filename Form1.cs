@@ -1,4 +1,5 @@
-
+using System.Data.SqlClient;
+using System.Diagnostics;
 namespace SE308Project
 {
     public partial class Form1 : Form
@@ -12,16 +13,17 @@ namespace SE308Project
         string b = "READ COMMITTED";
         string c = "REPEATABLE READ";
         string d = "SERIALIZABLE";
+        string connectionString = "Data Source=UMUTCAN\\SQLEXPRESS;Initial Catalog=AdventureWorks2022;Integrated Security=True;Encrypt=False;";
+
         public Form1()
         {
             InitializeComponent();
-             string connectionString = "Data Source=UMUTCAN\\SQLEXPRESS;Initial Catalog=AdventureWorks2022;Integrated Security=True;Encrypt=False;";
         }
 
         private void btnStartSim_Click(object sender, EventArgs e)
         {
-            UserCountA = Convert.ToInt16(numUserA.Value);
-            UserCountB = Convert.ToInt16(numUserB.Value);
+            //UserCountA = Convert.ToInt16(numUserA.Value);
+            //UserCountB = Convert.ToInt16(numUserB.Value);
 
             Thread userA = new Thread(UserA);
             Thread userB = new Thread(UserB);
@@ -34,14 +36,14 @@ namespace SE308Project
 
         private void UserA()
         {
-            lblUserA.Text = "User A Users: " + UserCountA;
+            //lblUserA.Text = "User A Users: " + UserCountA;
             Stopwatch stopwatch = new Stopwatch();
                     stopwatch.Start();
-            
-                    using (SqlConnection connection = new SqlConnection(connectionString))
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
                     {
                         connection.Open();
-                        for (int i = 0; i < 100; i++)
+                        for (int i = 0; i < 5; i++)
                         {
                             using (SqlCommand command = connection.CreateCommand())
                             {
@@ -67,18 +69,18 @@ namespace SE308Project
         }
         private void UserB()
         {
-            lblUserB.Text = "User B Users: " + UserCountB;
+            //lblUserB.Text = "User B Users: " + UserCountB;
             Stopwatch stopwatch = new Stopwatch();
                         stopwatch.Start();
                         using (SqlConnection connection = new SqlConnection(connectionString))
                                 {
                                     connection.Open();                        
-                                    for (int i = 0; i < 100; i++)
+                                    for (int i = 0; i < 5; i++)
                                     {
                                         using (SqlCommand command = connection.CreateCommand())
                                         {
                                             
-                                            command.CommandText = $"SET TRANSACTION ISOLATION LEVEL {b}; BEGIN TRANSACTION; " +
+                                            command.CommandText = $"SET TRANSACTION ISOLATION LEVEL {a}; BEGIN TRANSACTION; " +
                                                                   "UPDATE Sales.SalesOrderDetail SET UnitPrice = UnitPrice * 10.0 / 10.0 " +
                                                                   "WHERE UnitPrice > 100 AND EXISTS (SELECT * FROM Sales.SalesOrderHeader WHERE " +
                                                                   "Sales.SalesOrderHeader.SalesOrderID = Sales.SalesOrderDetail.SalesOrderID " +
