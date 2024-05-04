@@ -153,7 +153,7 @@
             // 
             // timer
             // 
-            timer.Interval = 1001;
+            timer.Interval = 3001;
             timer.Tick += timer_Tick;
             // 
             // Form1
