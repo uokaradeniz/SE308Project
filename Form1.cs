@@ -35,6 +35,7 @@ namespace SE308Project
             userB.Start();
 
             txt_EventLog.AppendText("Transaction Started!\n");
+            btnStartSim.Enabled = false;
         }
 
         private void UserA()
