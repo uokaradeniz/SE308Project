@@ -79,15 +79,15 @@ namespace SE308Project
                                     {
                                         using (SqlCommand command = connection.CreateCommand())
                                         {
-                                            
-                                            command.CommandText = $"SET TRANSACTION ISOLATION LEVEL {a}; BEGIN TRANSACTION; " +
-                                                                  "UPDATE Sales.SalesOrderDetail SET UnitPrice = UnitPrice * 10.0 / 10.0 " +
-                                                                  "WHERE UnitPrice > 100 AND EXISTS (SELECT * FROM Sales.SalesOrderHeader WHERE " +
-                                                                  "Sales.SalesOrderHeader.SalesOrderID = Sales.SalesOrderDetail.SalesOrderID " +
-                                                                  "AND Sales.SalesOrderHeader.OrderDate BETWEEN '20110101' AND '20151231' " +
-                                                                  "AND Sales.SalesOrderHeader.OnlineOrderFlag = 1); COMMIT TRANSACTION;";
-                        
-                                            command.ExecuteNonQuery();
+
+                        command.CommandText = "SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED; BEGIN TRANSACTION; " +
+                   "UPDATE Sales.SalesOrderDetail SET UnitPrice = UnitPrice * 10.0 / 10.0 " +
+                   "WHERE UnitPrice > 100 AND EXISTS (SELECT * FROM Sales.SalesOrderHeader WHERE " +
+                   "Sales.SalesOrderHeader.SalesOrderID = Sales.SalesOrderDetail.SalesOrderID " +
+                   "AND Sales.SalesOrderHeader.OrderDate BETWEEN '20110101' AND '20151231' " +
+                   "AND Sales.SalesOrderHeader.OnlineOrderFlag = 1); COMMIT TRANSACTION;";
+
+                        command.ExecuteNonQuery();
                                         }
                                     }
                                 }
