@@ -10,13 +10,14 @@ namespace SE308Project
         public int UserCountA { get => userCountA; set => userCountA = value; }
         public int UserCountB { get => userCountB; set => userCountB = value; }
 
-        //string connectionString = "Data Source=UGUROGUZHANPC\\SQLEXPRESS;Initial Catalog=AdventureWorks2022;Integrated Security=True;Encrypt=False;";
-        string connectionString = "Data Source=UMUTCAN\\SQLEXPRESS;Initial Catalog=AdventureWorks2022;Integrated Security=True";
+        string connectionString = "Data Source=UGUROGUZHANPC\\SQLEXPRESS;Initial Catalog=AdventureWorks2022;Integrated Security=True;Encrypt=False;";
+        //string connectionString = "Data Source=UMUTCAN\\SQLEXPRESS;Initial Catalog=AdventureWorks2022;Integrated Security=True";
         Stopwatch stopwatch;
 
         public Form1()
         {
             InitializeComponent();
+            Control.CheckForIllegalCrossThreadCalls = false; //Fixes thread error
             cmb_Isolation.SelectedIndex = 0;
             stopwatch = new Stopwatch();
         }
