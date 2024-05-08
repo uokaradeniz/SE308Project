@@ -32,7 +32,6 @@
             btnStartSim = new Button();
             lblUserA = new Label();
             lblUserB = new Label();
-            lblUserBCounter = new Label();
             label3 = new Label();
             cmb_Isolation = new ComboBox();
             btnQuit = new Button();
@@ -76,16 +75,6 @@
             lblUserB.TabIndex = 2;
             lblUserB.Text = "User B (Selector)";
             // 
-            // lblUserBCounter
-            // 
-            lblUserBCounter.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            lblUserBCounter.AutoSize = true;
-            lblUserBCounter.Location = new Point(107, 280);
-            lblUserBCounter.Name = "lblUserBCounter";
-            lblUserBCounter.Size = new Size(135, 20);
-            lblUserBCounter.TabIndex = 5;
-            lblUserBCounter.Text = "Elapsed Time: NaN";
-            // 
             // label3
             // 
             label3.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
@@ -120,6 +109,7 @@
             // numUserA
             // 
             numUserA.Location = new Point(43, 154);
+            numUserA.Maximum = new decimal(new int[] { 999999, 0, 0, 0 });
             numUserA.Name = "numUserA";
             numUserA.Size = new Size(120, 27);
             numUserA.TabIndex = 9;
@@ -127,6 +117,7 @@
             // numUserB
             // 
             numUserB.Location = new Point(204, 154);
+            numUserB.Maximum = new decimal(new int[] { 999999, 0, 0, 0 });
             numUserB.Name = "numUserB";
             numUserB.Size = new Size(119, 27);
             numUserB.TabIndex = 10;
@@ -153,6 +144,7 @@
             // 
             // timer
             // 
+            timer.Enabled = true;
             timer.Interval = 3001;
             timer.Tick += timer_Tick;
             // 
@@ -168,12 +160,11 @@
             Controls.Add(btnQuit);
             Controls.Add(cmb_Isolation);
             Controls.Add(label3);
-            Controls.Add(lblUserBCounter);
             Controls.Add(lblUserB);
             Controls.Add(lblUserA);
             Controls.Add(btnStartSim);
             Name = "Form1";
-            Text = "Transaction Sim";
+            Text = "Transaction Simulation";
             ((System.ComponentModel.ISupportInitialize)numUserA).EndInit();
             ((System.ComponentModel.ISupportInitialize)numUserB).EndInit();
             ResumeLayout(false);
@@ -185,7 +176,6 @@
         private Button btnStartSim;
         private Label lblUserA;
         private Label lblUserB;
-        private Label lblUserBCounter;
         private Label label3;
         private ComboBox cmb_Isolation;
         private Button btnQuit;
