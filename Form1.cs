@@ -10,19 +10,21 @@ namespace SE308Project
         public int UserCountA { get => userCountA; set => userCountA = value; }
         public int UserCountB { get => userCountB; set => userCountB = value; }
 
-        string connectionString = "Data Source=UGUROGUZHANPC\\SQLEXPRESS;Initial Catalog=AdventureWorks2022;Integrated Security=True;Encrypt=False;";
+        string connectionString = "Data Source=UGUROGUZHANPC;Initial Catalog=AdventureWorks2012;Integrated Security=True;Encrypt=False;";
         //string connectionString = "Data Source=UMUTCAN\\SQLEXPRESS;Initial Catalog=AdventureWorks2022;Integrated Security=True";
         Stopwatch stopwatch;
 
         public Form1()
         {
             InitializeComponent();
-            Control.CheckForIllegalCrossThreadCalls = false; //Fixes thread error
+            CheckForIllegalCrossThreadCalls = false; //Fixes thread error
             cmb_Isolation.SelectedIndex = 0;
             stopwatch = new Stopwatch();
+            timer.Stop();
         }
         private void btnStartSim_Click(object sender, EventArgs e)
         {
+            txt_EventLog.ResetText();
             UserCountA = Convert.ToInt16(numUserA.Value);
             UserCountB = Convert.ToInt16(numUserB.Value);
 
@@ -32,34 +34,50 @@ namespace SE308Project
             Thread userB = new Thread(UserB);
 
             stopwatch.Start();
-            timer.Enabled = true;
+            timer.Start();
             userA.Start();
             userB.Start();
 
             txt_EventLog.AppendText("Transaction Started!\n");
+
+            userA.Join();
+            userB.Join();
+
+            stopwatch.Stop();
+            txt_EventLog.AppendText("Transaction Finished!\n");
+            txt_EventLog.AppendText("Finish Time: " + string.Format("{0:mm\\:ss}", stopwatch.Elapsed) + " seconds" + "\n");
+            stopwatch.Reset();
+            timer.Stop();
         }
 
         private void UserA()
         {
-            
             txt_EventLog.AppendText("User A Users: " + UserCountA + "\n");
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
-                connection.Open(); 
-                for (int i = 0; i < 2; i++)
-               {
-                    using (SqlCommand command = connection.CreateCommand())
+                try
+                {
+                    connection.Open();
+                    for (int i = 0; i < UserCountA; i++)
                     {
-                        command.CommandText = "SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED; BEGIN TRANSACTION; " +
-                                              "SELECT SUM(Sales.SalesOrderDetail.OrderQty) FROM Sales.SalesOrderDetail " +
-                                              "WHERE UnitPrice > 100 AND EXISTS (SELECT * FROM Sales.SalesOrderHeader WHERE " +
-                                              "Sales.SalesOrderHeader.SalesOrderID = Sales.SalesOrderDetail.SalesOrderID " +
-                                              "AND Sales.SalesOrderHeader.OrderDate BETWEEN '20110101' AND '20151231' " +
-                                              "AND Sales.SalesOrderHeader.OnlineOrderFlag = 1); COMMIT TRANSACTION;";
+                        using (SqlCommand command = connection.CreateCommand())
+                        {
+                            command.CommandText = $"SET TRANSACTION ISOLATION LEVEL {cmb_Isolation.Text}; BEGIN TRANSACTION; " +
+                                                  "UPDATE Sales.SalesOrderDetail SET UnitPrice = UnitPrice * 10.0 / 10.0 " +
+                                                  "WHERE UnitPrice > 100 AND EXISTS (SELECT * FROM Sales.SalesOrderHeader WHERE " +
+                                                  "Sales.SalesOrderHeader.SalesOrderID = Sales.SalesOrderDetail.SalesOrderID " +
+                                                  "AND Sales.SalesOrderHeader.OrderDate BETWEEN '20110101' AND '20151231' " +
+                                                  "AND Sales.SalesOrderHeader.OnlineOrderFlag = 1); COMMIT TRANSACTION;";
 
-                        command.ExecuteNonQuery();
+                            command.ExecuteNonQuery();
+                        }
                     }
+                }
+                catch (Exception ex)
+                {
+                    //Catches deadlocks
+                    txt_EventLog.AppendText("---!---\nType A " + ex.Message + "\n---!---\n");
                 }
             }
 
@@ -73,21 +91,28 @@ namespace SE308Project
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
-                connection.Open();
-                for (int i = 0; i < 2; i++)
+                try
                 {
-                    using (SqlCommand command = connection.CreateCommand())
+                    connection.Open();
+                    for (int i = 0; i < UserCountB; i++)
                     {
+                        using (SqlCommand command = connection.CreateCommand())
+                        {
+                            command.CommandText = $"SET TRANSACTION ISOLATION LEVEL {cmb_Isolation.Text}; BEGIN TRANSACTION; " +
+                                                  "SELECT SUM(Sales.SalesOrderDetail.OrderQty) FROM Sales.SalesOrderDetail " +
+                                                  "WHERE UnitPrice > 100 AND EXISTS (SELECT * FROM Sales.SalesOrderHeader WHERE " +
+                                                  "Sales.SalesOrderHeader.SalesOrderID = Sales.SalesOrderDetail.SalesOrderID " +
+                                                  "AND Sales.SalesOrderHeader.OrderDate BETWEEN '20110101' AND '20151231' " +
+                                                  "AND Sales.SalesOrderHeader.OnlineOrderFlag = 1); COMMIT TRANSACTION;";
 
-                        command.CommandText = "SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED; BEGIN TRANSACTION; " +
-                                              "UPDATE Sales.SalesOrderDetail SET UnitPrice = UnitPrice * 10.0 / 10.0 " +
-                                              "WHERE UnitPrice > 100 AND EXISTS (SELECT * FROM Sales.SalesOrderHeader WHERE " +
-                                              "Sales.SalesOrderHeader.SalesOrderID = Sales.SalesOrderDetail.SalesOrderID " +
-                                              "AND Sales.SalesOrderHeader.OrderDate BETWEEN '20110101' AND '20151231' " +
-                                              "AND Sales.SalesOrderHeader.OnlineOrderFlag = 1); COMMIT TRANSACTION;";
-
-                        command.ExecuteNonQuery();
+                            command.ExecuteNonQuery();
+                        }
                     }
+                }
+                catch (Exception ex)
+                {
+                    //Catches deadlocks
+                    txt_EventLog.AppendText("---!---\nType B " + ex.Message + "\n---!---\n");
                 }
             }
 
