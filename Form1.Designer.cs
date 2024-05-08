@@ -164,7 +164,7 @@
             Controls.Add(lblUserA);
             Controls.Add(btnStartSim);
             Name = "Form1";
-            Text = "Transaction Sim";
+            Text = "Transaction Simulation";
             ((System.ComponentModel.ISupportInitialize)numUserA).EndInit();
             ((System.ComponentModel.ISupportInitialize)numUserB).EndInit();
             ResumeLayout(false);
