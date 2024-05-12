@@ -46,7 +46,7 @@
             // 
             // btnStartSim
             // 
-            btnStartSim.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            btnStartSim.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             btnStartSim.Location = new Point(107, 214);
             btnStartSim.Name = "btnStartSim";
             btnStartSim.Size = new Size(135, 54);
@@ -87,7 +87,7 @@
             // 
             // cmb_Isolation
             // 
-            cmb_Isolation.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            cmb_Isolation.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
             cmb_Isolation.FormattingEnabled = true;
             cmb_Isolation.Items.AddRange(new object[] { "READ UNCOMMITTED", "READ COMMITTED", "REPEATABLE READ", "SERIALIZABLE" });
             cmb_Isolation.Location = new Point(83, 57);
@@ -97,7 +97,7 @@
             // 
             // btnQuit
             // 
-            btnQuit.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            btnQuit.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             btnQuit.Location = new Point(23, 303);
             btnQuit.Name = "btnQuit";
             btnQuit.Size = new Size(73, 33);
@@ -124,6 +124,7 @@
             // 
             // txt_EventLog
             // 
+            txt_EventLog.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             txt_EventLog.BackColor = SystemColors.ButtonHighlight;
             txt_EventLog.Location = new Point(362, 57);
             txt_EventLog.Name = "txt_EventLog";

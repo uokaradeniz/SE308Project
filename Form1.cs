@@ -1,3 +1,4 @@
+using Microsoft.VisualBasic.ApplicationServices;
 using System.Data.SqlClient;
 using System.Diagnostics;
 namespace SE308Project
@@ -7,6 +8,11 @@ namespace SE308Project
         int userCountA = 0;
         int userCountB = 0;
 
+        bool simulationAlreadyStarted = false;
+
+        int userACompletedCount = 0;
+        int userBCompletedCount = 0;
+        object lockObj = new object();
         public int UserCountA { get => userCountA; set => userCountA = value; }
         public int UserCountB { get => userCountB; set => userCountB = value; }
 
@@ -24,33 +30,55 @@ namespace SE308Project
         }
         private void btnStartSim_Click(object sender, EventArgs e)
         {
-            txt_EventLog.ResetText();
-            UserCountA = Convert.ToInt16(numUserA.Value);
-            UserCountB = Convert.ToInt16(numUserB.Value);
+            if (simulationAlreadyStarted == true)
+            {
+                Application.Restart();
+            }
+            else
+            {
+                txt_EventLog.ResetText();
+                UserCountA = Convert.ToInt16(numUserA.Value);
+                UserCountB = Convert.ToInt16(numUserB.Value);
 
-            txt_EventLog.AppendText("Isolation Level: " + cmb_Isolation.SelectedItem + "\n");
+                txt_EventLog.AppendText("Isolation Level: " + cmb_Isolation.SelectedItem + "\n");
 
-            Thread userA = new Thread(UserA);
-            Thread userB = new Thread(UserB);
+                Thread[] userAThreads = new Thread[UserCountA];
+                Thread[] userBThreads = new Thread[UserCountB];
 
-            stopwatch.Start();
-            timer.Start();
-            userA.Start();
-            userB.Start();
+                for (int i = 0; i < userAThreads.Length; i++)
+                {
+                    userAThreads[i] = new Thread(() => UserA(ref userACompletedCount, lockObj));
+                    userAThreads[i].Start();
+                }
+                for (int i = 0; i < userBThreads.Length; i++)
+                {
+                    userBThreads[i] = new Thread(() => UserB(ref userBCompletedCount, lockObj));
+                    userBThreads[i].Start();
+                }
 
-            txt_EventLog.AppendText("Transaction Started!\n");
 
-            userA.Join();
-            userB.Join();
+                stopwatch.Start();
+                timer.Start();
 
-            stopwatch.Stop();
-            txt_EventLog.AppendText("Transaction Finished!\n");
-            txt_EventLog.AppendText("Finish Time: " + string.Format("{0:mm\\:ss}", stopwatch.Elapsed) + " seconds" + "\n");
-            stopwatch.Reset();
-            timer.Stop();
+                txt_EventLog.AppendText("Transaction Started!\n");
+
+                Thread[] mergedArray = userAThreads.Concat(userBThreads).ToArray();
+                foreach (var thread in mergedArray)
+                {
+                    thread.Join();
+                }
+
+                stopwatch.Stop();
+                txt_EventLog.AppendText("Transaction Finished!\n");
+                txt_EventLog.AppendText("Finish Time: " + string.Format("{0:mm\\:ss}", stopwatch.Elapsed) + " seconds" + "\n");
+                stopwatch.Reset();
+                timer.Stop();
+                simulationAlreadyStarted = true;
+                btnStartSim.Text = "Restart Application";
+            }
         }
 
-        private void UserA()
+        private void UserA(ref int userACompleteCount, object lockObj)
         {
             txt_EventLog.AppendText("User A Users: " + UserCountA + "\n");
 
@@ -59,19 +87,17 @@ namespace SE308Project
                 try
                 {
                     connection.Open();
-                    for (int i = 0; i < UserCountA; i++)
-                    {
-                        using (SqlCommand command = connection.CreateCommand())
-                        {
-                            command.CommandText = $"SET TRANSACTION ISOLATION LEVEL {cmb_Isolation.Text}; BEGIN TRANSACTION; " +
-                                                  "UPDATE Sales.SalesOrderDetail SET UnitPrice = UnitPrice * 10.0 / 10.0 " +
-                                                  "WHERE UnitPrice > 100 AND EXISTS (SELECT * FROM Sales.SalesOrderHeader WHERE " +
-                                                  "Sales.SalesOrderHeader.SalesOrderID = Sales.SalesOrderDetail.SalesOrderID " +
-                                                  "AND Sales.SalesOrderHeader.OrderDate BETWEEN '20110101' AND '20151231' " +
-                                                  "AND Sales.SalesOrderHeader.OnlineOrderFlag = 1); COMMIT TRANSACTION;";
 
-                            command.ExecuteNonQuery();
-                        }
+                    using (SqlCommand command = connection.CreateCommand())
+                    {
+                        command.CommandText = $"SET TRANSACTION ISOLATION LEVEL {cmb_Isolation.Text}; BEGIN TRANSACTION; " +
+                                              "UPDATE Sales.SalesOrderDetail SET UnitPrice = UnitPrice * 10.0 / 10.0 " +
+                                              "WHERE UnitPrice > 100 AND EXISTS (SELECT * FROM Sales.SalesOrderHeader WHERE " +
+                                              "Sales.SalesOrderHeader.SalesOrderID = Sales.SalesOrderDetail.SalesOrderID " +
+                                              "AND Sales.SalesOrderHeader.OrderDate BETWEEN '20110101' AND '20151231' " +
+                                              "AND Sales.SalesOrderHeader.OnlineOrderFlag = 1); COMMIT TRANSACTION;";
+
+                        command.ExecuteNonQuery();
                     }
                 }
                 catch (Exception ex)
@@ -79,13 +105,24 @@ namespace SE308Project
                     //Catches deadlocks
                     txt_EventLog.AppendText("---!---\nType A " + ex.Message + "\n---!---\n");
                 }
+                finally
+                {
+                    lock (lockObj)
+                    {
+                        userACompletedCount++;
+                    }
+
+                    if (userACompletedCount == UserCountA)
+                    {
+                        txt_EventLog.AppendText("Type A transactions completed in: " + string.Format("{0:mm\\:ss}", stopwatch.Elapsed) + " seconds\n");
+                    }
+                }
             }
 
-            txt_EventLog.AppendText("Type A transactions completed in: " + string.Format("{0:mm\\:ss}", stopwatch.Elapsed) + " seconds" + "\n");
 
         }
 
-        private void UserB()
+        private void UserB(ref int userACompleteCount, object lockObj)
         {
             txt_EventLog.AppendText("User B Users: " + UserCountB + "\n");
 
@@ -94,19 +131,17 @@ namespace SE308Project
                 try
                 {
                     connection.Open();
-                    for (int i = 0; i < UserCountB; i++)
-                    {
-                        using (SqlCommand command = connection.CreateCommand())
-                        {
-                            command.CommandText = $"SET TRANSACTION ISOLATION LEVEL {cmb_Isolation.Text}; BEGIN TRANSACTION; " +
-                                                  "SELECT SUM(Sales.SalesOrderDetail.OrderQty) FROM Sales.SalesOrderDetail " +
-                                                  "WHERE UnitPrice > 100 AND EXISTS (SELECT * FROM Sales.SalesOrderHeader WHERE " +
-                                                  "Sales.SalesOrderHeader.SalesOrderID = Sales.SalesOrderDetail.SalesOrderID " +
-                                                  "AND Sales.SalesOrderHeader.OrderDate BETWEEN '20110101' AND '20151231' " +
-                                                  "AND Sales.SalesOrderHeader.OnlineOrderFlag = 1); COMMIT TRANSACTION;";
 
-                            command.ExecuteNonQuery();
-                        }
+                    using (SqlCommand command = connection.CreateCommand())
+                    {
+                        command.CommandText = $"SET TRANSACTION ISOLATION LEVEL {cmb_Isolation.Text}; BEGIN TRANSACTION; " +
+                                              "SELECT SUM(Sales.SalesOrderDetail.OrderQty) FROM Sales.SalesOrderDetail " +
+                                              "WHERE UnitPrice > 100 AND EXISTS (SELECT * FROM Sales.SalesOrderHeader WHERE " +
+                                              "Sales.SalesOrderHeader.SalesOrderID = Sales.SalesOrderDetail.SalesOrderID " +
+                                              "AND Sales.SalesOrderHeader.OrderDate BETWEEN '20110101' AND '20151231' " +
+                                              "AND Sales.SalesOrderHeader.OnlineOrderFlag = 1); COMMIT TRANSACTION;";
+
+                        command.ExecuteNonQuery();
                     }
                 }
                 catch (Exception ex)
@@ -114,9 +149,19 @@ namespace SE308Project
                     //Catches deadlocks
                     txt_EventLog.AppendText("---!---\nType B " + ex.Message + "\n---!---\n");
                 }
-            }
+                finally
+                {
+                    lock (lockObj)
+                    {
+                        userBCompletedCount++;
+                    }
 
-            txt_EventLog.AppendText("Type B transactions completed in: " + string.Format("{0:mm\\:ss}", stopwatch.Elapsed) + " seconds\n");
+                    if (userBCompletedCount == UserCountB)
+                    {
+                        txt_EventLog.AppendText("Type B transactions completed in: " + string.Format("{0:mm\\:ss}", stopwatch.Elapsed) + " seconds\n");
+                    }
+                }
+            }
         }
 
         private void btnQuit_Click(object sender, EventArgs e)
