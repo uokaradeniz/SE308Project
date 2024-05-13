@@ -16,7 +16,7 @@ namespace SE308Project
         public int UserCountA { get => userCountA; set => userCountA = value; }
         public int UserCountB { get => userCountB; set => userCountB = value; }
 
-        string connectionString = "Data Source=UGUROGUZHANPC;Initial Catalog=AdventureWorks2012;Integrated Security=True;Encrypt=False;";
+        string connectionString = "Data Source=UGUROGUZHANPC;Initial Catalog=AdventureWorks2012;Integrated Security=True;Encrypt=False; Connect Timeout=999;";
         //string connectionString = "Data Source=UMUTCAN\\SQLEXPRESS;Initial Catalog=AdventureWorks2022;Integrated Security=True";
         Stopwatch stopwatch;
 
@@ -96,6 +96,7 @@ namespace SE308Project
                                               "Sales.SalesOrderHeader.SalesOrderID = Sales.SalesOrderDetail.SalesOrderID " +
                                               "AND Sales.SalesOrderHeader.OrderDate BETWEEN '20110101' AND '20151231' " +
                                               "AND Sales.SalesOrderHeader.OnlineOrderFlag = 1); COMMIT TRANSACTION;";
+                        command.CommandTimeout = 999;
 
                         command.ExecuteNonQuery();
                     }
@@ -140,7 +141,7 @@ namespace SE308Project
                                               "Sales.SalesOrderHeader.SalesOrderID = Sales.SalesOrderDetail.SalesOrderID " +
                                               "AND Sales.SalesOrderHeader.OrderDate BETWEEN '20110101' AND '20151231' " +
                                               "AND Sales.SalesOrderHeader.OnlineOrderFlag = 1); COMMIT TRANSACTION;";
-
+                        command.CommandTimeout = 999;
                         command.ExecuteNonQuery();
                     }
                 }
