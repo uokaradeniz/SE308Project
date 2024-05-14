@@ -19,7 +19,7 @@ namespace SE308Project
         public int DeadlockCount { get => deadlockCount; set => deadlockCount = value; }
 
         string connectionString = "Data Source=UGUROGUZHANPC;Initial Catalog=AdventureWorks2012;Integrated Security=True;Encrypt=False; Connect Timeout=999;";
-        //string connectionString = "Data Source=UMUTCAN\\SQLEXPRESS;Initial Catalog=AdventureWorks2022;Integrated Security=True";
+        //string connectionString = "Data Source=UMUTCAN\\SQLEXPRESS;Initial Catalog=AdventureWorks2022;Integrated Security=True Connect Timeout=999";
         Stopwatch stopwatch;
 
         public Form1()
