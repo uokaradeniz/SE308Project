@@ -13,8 +13,10 @@ namespace SE308Project
         int userACompletedCount = 0;
         int userBCompletedCount = 0;
         object lockObj = new object();
+        int deadlockCount;
         public int UserCountA { get => userCountA; set => userCountA = value; }
         public int UserCountB { get => userCountB; set => userCountB = value; }
+        public int DeadlockCount { get => deadlockCount; set => deadlockCount = value; }
 
         string connectionString = "Data Source=UGUROGUZHANPC;Initial Catalog=AdventureWorks2012;Integrated Security=True;Encrypt=False; Connect Timeout=999;";
         //string connectionString = "Data Source=UMUTCAN\\SQLEXPRESS;Initial Catalog=AdventureWorks2022;Integrated Security=True";
@@ -61,6 +63,8 @@ namespace SE308Project
                 timer.Start();
 
                 txt_EventLog.AppendText("Transaction Started!\n");
+                txt_EventLog.AppendText("Type A Users: " + UserCountA + "\n");
+                txt_EventLog.AppendText("Type B Users: " + UserCountB + "\n");
 
                 Thread[] mergedArray = userAThreads.Concat(userBThreads).ToArray();
                 foreach (var thread in mergedArray)
@@ -70,6 +74,7 @@ namespace SE308Project
 
                 stopwatch.Stop();
                 txt_EventLog.AppendText("Transaction Finished!\n");
+                txt_EventLog.AppendText("Total Deadlocks: " + DeadlockCount + "\n");
                 txt_EventLog.AppendText("Finish Time: " + string.Format("{0:mm\\:ss}", stopwatch.Elapsed) + " seconds" + "\n");
                 stopwatch.Reset();
                 timer.Stop();
@@ -80,8 +85,6 @@ namespace SE308Project
 
         private void UserA(ref int userACompleteCount, object lockObj)
         {
-            txt_EventLog.AppendText("User A Users: " + UserCountA + "\n");
-
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 try
@@ -104,7 +107,11 @@ namespace SE308Project
                 catch (Exception ex)
                 {
                     //Catches deadlocks
-                    txt_EventLog.AppendText("---!---\nType A " + ex.Message + "\n---!---\n");
+                    if (ex.Message.Contains("deadlocked"))
+                    {
+                        DeadlockCount++;
+                        //txt_EventLog.AppendText("---!---\nType A " + ex.Message + "\n---!---\n");
+                    }
                 }
                 finally
                 {
@@ -119,14 +126,10 @@ namespace SE308Project
                     }
                 }
             }
-
-
         }
 
         private void UserB(ref int userACompleteCount, object lockObj)
         {
-            txt_EventLog.AppendText("User B Users: " + UserCountB + "\n");
-
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 try
@@ -148,7 +151,11 @@ namespace SE308Project
                 catch (Exception ex)
                 {
                     //Catches deadlocks
-                    txt_EventLog.AppendText("---!---\nType B " + ex.Message + "\n---!---\n");
+                    if (ex.Message.Contains("deadlocked"))
+                    {
+                        DeadlockCount++;
+                        //txt_EventLog.AppendText("---!---\nType B " + ex.Message + "\n---!---\n");
+                    }
                 }
                 finally
                 {
