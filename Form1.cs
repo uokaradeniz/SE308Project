@@ -104,9 +104,6 @@ namespace SE308Project
             else if (randomNum < 1)
                 date = 5;
 
-            txt_EventLog.AppendText(randomNum.ToString() + "\n");
-            txt_EventLog.AppendText(date.ToString() + "\n");
-
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 try
@@ -132,7 +129,6 @@ namespace SE308Project
                     if (ex.Message.Contains("deadlocked"))
                     {
                         DeadlockCountA++;
-                        //txt_EventLog.AppendText("---!---\nType A " + ex.Message + "\n---!---\n");
                     }
                 }
                 finally
@@ -167,9 +163,6 @@ namespace SE308Project
             else if (randomNum < 1)
                 date = 5;
 
-            txt_EventLog.AppendText(randomNum.ToString() + "\n");
-            txt_EventLog.AppendText(date.ToString() + "\n");
-
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 try
@@ -194,7 +187,6 @@ namespace SE308Project
                     if (ex.Message.Contains("deadlocked"))
                     {
                         DeadlockCountB++;
-                        //txt_EventLog.AppendText("---!---\nType B " + ex.Message + "\n---!---\n");
                     }
                 }
                 finally
