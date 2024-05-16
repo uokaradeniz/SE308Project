@@ -89,6 +89,24 @@ namespace SE308Project
 
         private void UserA(ref int userACompleteCount, object lockObj)
         {
+            Random random = new Random();
+            float randomNum = random.NextSingle();
+            int date = 0;
+
+            if (randomNum < 0.2)
+                date = 1;
+            else if (randomNum < 0.4)
+                date = 2;
+            else if (randomNum < 0.6)
+                date = 3;
+            else if (randomNum < 0.8)
+                date = 4;
+            else if (randomNum < 1)
+                date = 5;
+
+            txt_EventLog.AppendText(randomNum.ToString() + "\n");
+            txt_EventLog.AppendText(date.ToString() + "\n");
+
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 try
@@ -101,7 +119,7 @@ namespace SE308Project
                                               "UPDATE Sales.SalesOrderDetail SET UnitPrice = UnitPrice * 10.0 / 10.0 " +
                                               "WHERE UnitPrice > 100 AND EXISTS (SELECT * FROM Sales.SalesOrderHeader WHERE " +
                                               "Sales.SalesOrderHeader.SalesOrderID = Sales.SalesOrderDetail.SalesOrderID " +
-                                              "AND Sales.SalesOrderHeader.OrderDate BETWEEN '20110101' AND '20151231' " +
+                                              $"AND Sales.SalesOrderHeader.OrderDate BETWEEN '201{date}0101' AND '201{date}1231' " +
                                               "AND Sales.SalesOrderHeader.OnlineOrderFlag = 1); COMMIT TRANSACTION;";
                         command.CommandTimeout = 999;
 
@@ -134,6 +152,24 @@ namespace SE308Project
 
         private void UserB(ref int userACompleteCount, object lockObj)
         {
+            Random random = new Random();
+            float randomNum = random.NextSingle();
+            int date = 0;
+
+            if (randomNum < 0.2)
+                date = 1;
+            else if (randomNum < 0.4)
+                date = 2;
+            else if (randomNum < 0.6)
+                date = 3;
+            else if (randomNum < 0.8)
+                date = 4;
+            else if (randomNum < 1)
+                date = 5;
+
+            txt_EventLog.AppendText(randomNum.ToString() + "\n");
+            txt_EventLog.AppendText(date.ToString() + "\n");
+
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 try
@@ -146,7 +182,7 @@ namespace SE308Project
                                               "SELECT SUM(Sales.SalesOrderDetail.OrderQty) FROM Sales.SalesOrderDetail " +
                                               "WHERE UnitPrice > 100 AND EXISTS (SELECT * FROM Sales.SalesOrderHeader WHERE " +
                                               "Sales.SalesOrderHeader.SalesOrderID = Sales.SalesOrderDetail.SalesOrderID " +
-                                              "AND Sales.SalesOrderHeader.OrderDate BETWEEN '20110101' AND '20151231' " +
+                                              $"AND Sales.SalesOrderHeader.OrderDate BETWEEN '201{date}0101' AND '201{date}1231' " +
                                               "AND Sales.SalesOrderHeader.OnlineOrderFlag = 1); COMMIT TRANSACTION;";
                         command.CommandTimeout = 999;
                         command.ExecuteNonQuery();
