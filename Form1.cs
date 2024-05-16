@@ -13,10 +13,13 @@ namespace SE308Project
         int userACompletedCount = 0;
         int userBCompletedCount = 0;
         object lockObj = new object();
-        int deadlockCount;
+        int deadlockCountA;
+        int deadlockCountB;
+
         public int UserCountA { get => userCountA; set => userCountA = value; }
         public int UserCountB { get => userCountB; set => userCountB = value; }
-        public int DeadlockCount { get => deadlockCount; set => deadlockCount = value; }
+        public int DeadlockCountA { get => deadlockCountA; set => deadlockCountA = value; }
+        public int DeadlockCountB { get => deadlockCountB; set => deadlockCountB = value; }
 
         string connectionString = "Data Source=UGUROGUZHANPC;Initial Catalog=AdventureWorks2012;Integrated Security=True;Encrypt=False; Connect Timeout=999;";
         //string connectionString = "Data Source=UMUTCAN\\SQLEXPRESS;Initial Catalog=AdventureWorks2022;Integrated Security=True Connect Timeout=999";
@@ -74,7 +77,8 @@ namespace SE308Project
 
                 stopwatch.Stop();
                 txt_EventLog.AppendText("Transaction Finished!\n");
-                txt_EventLog.AppendText("Total Deadlocks: " + DeadlockCount + "\n");
+                txt_EventLog.AppendText("Type A User Deadlocks: " + DeadlockCountA + "\n");
+                txt_EventLog.AppendText("Type B User Deadlocks: " + DeadlockCountB + "\n");
                 txt_EventLog.AppendText("Finish Time: " + string.Format("{0:mm\\:ss}", stopwatch.Elapsed) + " seconds" + "\n");
                 stopwatch.Reset();
                 timer.Stop();
@@ -109,7 +113,7 @@ namespace SE308Project
                     //Catches deadlocks
                     if (ex.Message.Contains("deadlocked"))
                     {
-                        DeadlockCount++;
+                        DeadlockCountA++;
                         //txt_EventLog.AppendText("---!---\nType A " + ex.Message + "\n---!---\n");
                     }
                 }
@@ -153,7 +157,7 @@ namespace SE308Project
                     //Catches deadlocks
                     if (ex.Message.Contains("deadlocked"))
                     {
-                        DeadlockCount++;
+                        DeadlockCountB++;
                         //txt_EventLog.AppendText("---!---\nType B " + ex.Message + "\n---!---\n");
                     }
                 }
