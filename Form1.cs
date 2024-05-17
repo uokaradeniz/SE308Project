@@ -146,7 +146,7 @@ namespace SE308Project
             }
         }
 
-        private void UserB(ref int userACompleteCount, object lockObj)
+        private void UserB(ref int userBCompleteCount, object lockObj)
         {
             Random random = new Random();
             float randomNum = random.NextSingle();
